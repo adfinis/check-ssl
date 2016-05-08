@@ -1,0 +1,7 @@
+name: check-ssl
+description: "file:///README.md"
+url: "https://github.com/adfinis-sygroup/check-ssl"
+tags: ssl, openssl, tls, alarms
+vendor: Linux
+type: Plugin
+license: gplv3
