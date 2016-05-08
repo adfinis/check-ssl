@@ -5,3 +5,4 @@ tags: ssl, openssl, tls, alarms
 vendor: Linux
 type: Plugin
 license: gplv3
+target: Operating System
