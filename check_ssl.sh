@@ -87,14 +87,14 @@ if [[ -z "${PROTOCOL}" ]]; then
 	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${HOST}":"${PORT}" 2>&- | openssl x509 -enddate -noout)
 	while [ "${?}" = "1" ]; do
 		echo "Check Hostname"
-		exit 1
+		exit 2
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
 else
 		HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${HOST}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -noout)
 	while [ "${?}" = "1" ]; do
 		echo "Check Hostname"
-		exit 1
+		exit 2
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
 fi
