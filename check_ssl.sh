@@ -8,6 +8,7 @@ BOLD=`tput bold`
 REV=`tput smso`
 echo -e \\n"Help documentation for ${BOLD}$0${NORM}"\\n
 echo "${REV}-H${NORM}  --Sets the value for the ${BOLD}h${NORM}ostname. e.g ${BOLD}adfinis-sygroup.ch${NORM}."
+echo "${REV}-i${NORM}  --Sets the value for the ${BOLD}i${NORM} to connect. e.g ${BOLD}127.0.0.1${NORM} (optional)."
 echo "${REV}-p${NORM}  --Sets the value for the ${BOLD}p${NORM}ort. e.g ${BOLD}443${NORM}."
 echo "${REV}-P${NORM}  --Sets an optional value for an TLS ${BOLD}P${NORM}rotocol. e.g ${BOLD}xmpp${NORM}."
 echo "${REV}-w${NORM}  --Sets the value for the days before ${BOLD}w${NORM}arning. Default are ${BOLD}30${NORM}."
@@ -21,7 +22,7 @@ exit
 #---------------
 # GET HOSTINFO |
 #---------------
-while getopts :H:p:P:w:c:h FLAG; do
+while getopts :H:p:P:w:c:i:h FLAG; do
 	case $FLAG in
 		H) #set host
 			HOST=$OPTARG
@@ -46,6 +47,10 @@ while getopts :H:p:P:w:c:h FLAG; do
 		c) #set day before Critical
 			CRITICAL_DAYS=$OPTARG
 			;;
+
+    i) #set ip to connect (instead of dns)
+      IP=$OPTARG
+      ;;
 
 		h) #show help
 			HELP
@@ -75,6 +80,10 @@ if [[ -z "${HOST}" ]]; then
 	HELP
 fi
 
+if [[ -z "${IP}" ]]; then
+  IP=${HOST}
+fi
+
 #-----------
 # GET DATE |
 #-----------
@@ -84,14 +93,14 @@ DATE_ACTUALLY_SECONDS=$(date +"%s")
 # GET CERTIFICATE |
 #------------------
 if [[ -z "${PROTOCOL}" ]]; then
-	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${HOST}":"${PORT}" 2>&- | openssl x509 -enddate -noout)
+	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" 2>&- | openssl x509 -enddate -noout)
 	while [ "${?}" = "1" ]; do
 		echo "Check Hostname"
 		exit 1
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
 else
-		HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${HOST}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -noout)
+		HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -noout)
 	while [ "${?}" = "1" ]; do
 		echo "Check Hostname"
 		exit 1
