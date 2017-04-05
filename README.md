@@ -20,6 +20,8 @@
 ## The Script can deal with these options:
 * -H
   * Sets the value for the hostname. e.g adfinis-sygroup.ch
+* -I
+  * Sets an optional value for an IP to connect. e.g 127.0.0.1
 * -p
   * Sets the value for the port. e.g 443
 * -P
@@ -27,7 +29,7 @@
 * -w
   * Sets the value for the days before warning. Default is 30
 * -c
-   * Sets the value for the days before critical. Default is 5
+  * Sets the value for the days before critical. Default is 5
 * -h
 
 
