@@ -98,7 +98,7 @@ if [[ -z "${PROTOCOL}" ]]; then
 		exit 2
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-        COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+      COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
 else
 	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -subject -noout)
 	while [ "${?}" = "1" ]; do
