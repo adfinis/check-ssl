@@ -98,7 +98,13 @@ if [[ -z "${PROTOCOL}" ]]; then
 		exit 2
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-      COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+	if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
+		# OpenSSL 1.0.X output format
+		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+	elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
+		# OpenSSL 1.1.X output format
+		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
+	fi
 else
 	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -subject -noout)
 	while [ "${?}" = "1" ]; do
@@ -106,7 +112,13 @@ else
 		exit 2
 	done
 	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" | sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-        COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+	if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
+		# OpenSSL 1.0.X output format
+		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+	elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
+		# OpenSSL 1.1.X output format
+		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
+	fi
 fi
 
 #-------------------
@@ -120,15 +132,15 @@ DATE_DIFFERENCE_DAYS=$((${DATE_DIFFERENCE_SECONDS}/60/60/24))
 # OUTPUT |
 #---------
 if [[ "${DATE_DIFFERENCE_DAYS}" -le "${CRITICAL_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "CRITICAL: Cert "$COMMON_NAME" will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "CRITICAL: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
 	exit 2
 elif [[ "${DATE_DIFFERENCE_DAYS}" -le "${WARNING_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "WARNING: Cert "$COMMON_NAME" will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "WARNING: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
 	exit 1
 elif [[ "${DATE_DIFFERENCE_DAYS}" -lt "0" ]]; then
-	echo -e "CRITICAL: Cert "$COMMON_NAME" expired on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "CRITICAL: Cert $COMMON_NAME expired on: "${DATE_EXPIRE_FORMAT}""
 	exit 2
 else
-	echo -e "OK: Cert "$COMMON_NAME" will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "OK: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
 	exit 0
 fi
