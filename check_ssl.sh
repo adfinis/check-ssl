@@ -91,34 +91,23 @@ DATE_ACTUALLY_SECONDS=$(date +"%s")
 #------------------
 # GET CERTIFICATE |
 #------------------
-if [[ -z "${PROTOCOL}" ]]; then
-	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" 2>&- | openssl x509 -enddate -subject -noout)
-	while [ "${?}" = "1" ]; do
-		echo "Check Hostname"
-		exit 2
-	done
-	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-	if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
-		# OpenSSL 1.0.X output format
-		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
-	elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
-		# OpenSSL 1.1.X output format
-		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
-	fi
+if [[ -n "${PROTOCOL}" ]]; then
+	HOST_CHECK_COMMAND="openssl s_client -servername ${HOST} -connect ${IP}:${PORT} -starttls ${PROTOCOL}"
 else
-	HOST_CHECK=$(openssl s_client -servername "${HOST}" -connect "${IP}":"${PORT}" -starttls "${PROTOCOL}" 2>&- | openssl x509 -enddate -subject -noout)
-	while [ "${?}" = "1" ]; do
-		echo "Check Hostname"
-		exit 2
-	done
-	DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" | sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-	if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
-		# OpenSSL 1.0.X output format
-		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
-	elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
-		# OpenSSL 1.1.X output format
-		COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
-	fi
+	HOST_CHECK_COMMAND="openssl s_client -servername ${HOST} -connect ${IP}:${PORT}"
+fi
+HOST_CHECK=$(${HOST_CHECK_COMMAND} 2>&- | openssl x509 -enddate -subject -noout)
+while [ "${?}" = "1" ]; do
+	echo "Check Hostname"
+	exit 2
+done
+DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
+if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
+	# OpenSSL 1.0.X output format
+	COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
+elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
+	# OpenSSL 1.1.X output format
+	COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
 fi
 
 #-------------------
