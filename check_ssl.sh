@@ -3,9 +3,9 @@
 # HELP |
 #-------
 function HELP {
-NORM=`tput sgr0`
-BOLD=`tput bold`
-REV=`tput smso`
+NORM=$(tput sgr0)
+BOLD=$(tput bold)
+REV=$(tput smso)
 echo -e \\n"Help documentation for ${BOLD}$0${NORM}"\\n
 echo "${REV}-H${NORM}  --Sets the value for the ${BOLD}h${NORM}ostname. e.g ${BOLD}adfinis-sygroup.ch${NORM}."
 echo "${REV}-I${NORM}  --Sets an optional value for an ${BOLD}i${NORM}p to connect. e.g ${BOLD}127.0.0.1${NORM}."
@@ -62,12 +62,12 @@ while getopts :H:I:p:P:w:c:h FLAG; do
 done
 
 if [[ -z "${1}" ]]; then
-	read -p "Hostname: " HOST
-	read -p "Port (443): " PORT
+	read -rp "Hostname: " HOST
+	read -rp "Port (443): " PORT
 	if [[ -z "${PORT}" ]]; then
 		PORT=443
 	else
-		read -p "Protocol (leave empty, when It's a SSL Protocol): " PROTOCOL
+		read -rp "Protocol (leave empty, when It's a SSL Protocol): " PROTOCOL
 	fi
 fi
 
@@ -125,22 +125,22 @@ fi
 # DATE CALCULATION |
 #-------------------
 DATE_EXPIRE_FORMAT=$(date -I --date="@${DATE_EXPIRE_SECONDS}")
-DATE_DIFFERENCE_SECONDS=$((${DATE_EXPIRE_SECONDS}-${DATE_ACTUALLY_SECONDS}))
-DATE_DIFFERENCE_DAYS=$((${DATE_DIFFERENCE_SECONDS}/60/60/24))
+DATE_DIFFERENCE_SECONDS=$((DATE_EXPIRE_SECONDS - DATE_ACTUALLY_SECONDS))
+DATE_DIFFERENCE_DAYS=$((DATE_DIFFERENCE_SECONDS/60/60/24))
 
 #---------
 # OUTPUT |
 #---------
 if [[ "${DATE_DIFFERENCE_DAYS}" -le "${CRITICAL_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "CRITICAL: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "CRITICAL: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
 	exit 2
 elif [[ "${DATE_DIFFERENCE_DAYS}" -le "${WARNING_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "WARNING: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "WARNING: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
 	exit 1
 elif [[ "${DATE_DIFFERENCE_DAYS}" -lt "0" ]]; then
-	echo -e "CRITICAL: Cert $COMMON_NAME expired on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "CRITICAL: Cert $COMMON_NAME expired on: ${DATE_EXPIRE_FORMAT}"
 	exit 2
 else
-	echo -e "OK: Cert $COMMON_NAME will expire on: "${DATE_EXPIRE_FORMAT}""
+	echo -e "OK: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
 	exit 0
 fi
