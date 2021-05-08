@@ -101,14 +101,12 @@ while [ "${?}" = "1" ]; do
 	echo "Check Hostname"
 	exit 2
 done
-DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
-if [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN=" > /dev/null; echo $?) -eq 0 ]]; then
-	# OpenSSL 1.0.X output format
-	COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN=//' | sed 's/\s.*$//')
-elif [[ $(echo "${HOST_CHECK}" | grep "subject" | grep "CN = " > /dev/null; echo $?) -eq 0 ]]; then
-	# OpenSSL 1.1.X output format
-	COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject" | sed 's/^.*CN = //' | sed 's/\s.*$//')
-fi
+DATE_EXPIRE_SECONDS=$(echo "${HOST_CHECK}" | grep "notAfter=" |sed 's/^notAfter=//g' | xargs -I{} date -d {} +%s)
+# The regular expression "CN ?= ?" is required because OpenSSL 1.0 and
+# OpenSSL 1.1 have different output formats for subject:
+# OpenSSL 1.0: "subject= /CN=example.com"
+# OpenSSL 1.1: "subject=CN = example.com"
+COMMON_NAME=$(echo "${HOST_CHECK}" | grep "subject=" | sed -E 's/^.*CN ?= ?//' | sed 's/\s.*$//')
 
 #-------------------
 # DATE CALCULATION |
