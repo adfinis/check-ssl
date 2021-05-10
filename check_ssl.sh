@@ -4,22 +4,22 @@
 # HELP |
 #-------
 HELP () {
-  NORM=$(tput sgr0)
-  BOLD=$(tput bold)
-  REV=$(tput smso)
-cat << EOH
-Help documentation for ${BOLD}$0${NORM}
-${REV}-H${NORM}  --Sets the value for the ${BOLD}h${NORM}ostname. e.g ${BOLD}example.com${NORM}.
-${REV}-I${NORM}  --Sets an optional value for an ${BOLD}i${NORM}p to connect. e.g ${BOLD}127.0.0.1${NORM}.
-${REV}-p${NORM}  --Sets the value for the ${BOLD}p${NORM}ort. e.g ${BOLD}443${NORM}.
-${REV}-P${NORM}  --Sets an optional value for an TLS ${BOLD}P${NORM}rotocol. e.g ${BOLD}xmpp${NORM}.
-${REV}-w${NORM}  --Sets the value for the days before ${BOLD}w${NORM}arning. Default are ${BOLD}30${NORM}.
-${REV}-c${NORM}  --Sets the value for the days before ${BOLD}C${NORM}ritical. Default are ${BOLD}5${NORM}.
-${REV}-h${NORM}  --Displays this ${BOLD}h${NORM}elp message.
-Example: ${BOLD}$0 -H example.com -p 443 -w 40${NORM}
-Or: ${BOLD}$0 -H xmpp.example.com -p 5222 -P xmpp -w 30 -c 5${NORM}
-EOH
-  exit
+	NORM=$(tput sgr0)
+	BOLD=$(tput bold)
+	REV=$(tput smso)
+	cat <<- EOH
+	Help documentation for ${BOLD}$0${NORM}
+	${REV}-H${NORM}  --Sets the value for the ${BOLD}h${NORM}ostname. e.g ${BOLD}example.com${NORM}.
+	${REV}-I${NORM}  --Sets an optional value for an ${BOLD}i${NORM}p to connect. e.g ${BOLD}127.0.0.1${NORM}.
+	${REV}-p${NORM}  --Sets the value for the ${BOLD}p${NORM}ort. e.g ${BOLD}443${NORM}.
+	${REV}-P${NORM}  --Sets an optional value for an TLS ${BOLD}P${NORM}rotocol. e.g ${BOLD}xmpp${NORM}.
+	${REV}-w${NORM}  --Sets the value for the days before ${BOLD}w${NORM}arning. Default are ${BOLD}30${NORM}.
+	${REV}-c${NORM}  --Sets the value for the days before ${BOLD}C${NORM}ritical. Default are ${BOLD}5${NORM}.
+	${REV}-h${NORM}  --Displays this ${BOLD}h${NORM}elp message.
+	Example: ${BOLD}$0 -H example.com -p 443 -w 40${NORM}
+	Or: ${BOLD}$0 -H xmpp.example.com -p 5222 -P xmpp -w 30 -c 5${NORM}
+	EOH
+	exit
 }
 
 #---------------
