@@ -55,7 +55,7 @@ while getopts :H:I:p:P:w:c:h FLAG; do
 			HELP
 			;;
 
-			*)
+		*)
 			HELP
 			;;
 	esac
