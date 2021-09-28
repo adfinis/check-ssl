@@ -15,6 +15,7 @@ HELP () {
 	${REV}-P${NORM}  --Sets an optional value for an TLS ${BOLD}P${NORM}rotocol. e.g ${BOLD}xmpp${NORM}.
 	${REV}-w${NORM}  --Sets the value for the days before ${BOLD}w${NORM}arning. Default are ${BOLD}30${NORM}.
 	${REV}-c${NORM}  --Sets the value for the days before ${BOLD}C${NORM}ritical. Default are ${BOLD}5${NORM}.
+	${REV}-q${NORM}  --${BOLD}Q${NORM}uiet mode. Only show warnings and errors.
 	${REV}-h${NORM}  --Displays this ${BOLD}h${NORM}elp message.
 	Example: ${BOLD}$0 -H example.com -p 443 -w 40${NORM}
 	Or: ${BOLD}$0 -H xmpp.example.com -p 5222 -P xmpp -w 30 -c 5${NORM}
@@ -25,7 +26,7 @@ HELP () {
 #---------------
 # GET HOSTINFO |
 #---------------
-while getopts :H:I:p:P:w:c:h FLAG; do
+while getopts :H:I:p:P:w:c:qh FLAG; do
 	case $FLAG in
 		H) #set host
 			HOST=$OPTARG
@@ -56,6 +57,10 @@ while getopts :H:I:p:P:w:c:h FLAG; do
 
 		h) #show help
 			HELP
+			;;
+
+		q) #quiet mode
+			QUIET=1
 			;;
 
 		*)
@@ -131,6 +136,8 @@ elif [[ "${DATE_DIFFERENCE_DAYS}" -lt "0" ]]; then
 	echo -e "CRITICAL: Cert $COMMON_NAME expired on: ${DATE_EXPIRE_FORMAT}"
 	exit 2
 else
-	echo -e "OK: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
+	if [[ "${QUIET}" -lt 1 ]]; then
+		echo -e "OK: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
+	fi
 	exit 0
 fi
