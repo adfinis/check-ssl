@@ -100,7 +100,7 @@ if [[ -z "${HOST}" ]]; then
 fi
 
 if [[ -z "${IP}" ]]; then
-  IP=${HOST}
+	IP=${HOST}
 fi
 
 if [[ -z "${LABEL}" && -f /etc/services ]]; then
