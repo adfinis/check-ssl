@@ -23,6 +23,13 @@ HELP () {
 	exit
 }
 
+#-----------------
+# DEFAULT VALUES |
+#-----------------
+CRITICAL_DAYS=5
+QUIET=0
+WARNING_DAYS=30
+
 #---------------
 # GET HOSTINFO |
 #---------------
