@@ -15,6 +15,7 @@ HELP () {
 	${REV}-P${NORM}  --Sets an optional value for an TLS ${BOLD}P${NORM}rotocol. e.g ${BOLD}xmpp${NORM}.
 	${REV}-w${NORM}  --Sets the value for the days before ${BOLD}w${NORM}arning. Default are ${BOLD}30${NORM}.
 	${REV}-c${NORM}  --Sets the value for the days before ${BOLD}C${NORM}ritical. Default are ${BOLD}5${NORM}.
+	${REV}-l${NORM}  --Sets an optional ${BOLD}l${NORM}abel for the host in messages. Default uses /etc/services.
 	${REV}-q${NORM}  --${BOLD}Q${NORM}uiet mode. Only show warnings and errors.
 	${REV}-h${NORM}  --Displays this ${BOLD}h${NORM}elp message.
 	Example: ${BOLD}$0 -H example.com -p 443 -w 40${NORM}
@@ -33,13 +34,17 @@ WARNING_DAYS=30
 #---------------
 # GET HOSTINFO |
 #---------------
-while getopts :H:I:p:P:w:c:qh FLAG; do
+while getopts :H:I:l:p:P:w:c:qh FLAG; do
 	case $FLAG in
 		H) #set host
 			HOST=$OPTARG
 			;;
 		I) #set ip to connect
 			IP=$OPTARG
+			;;
+
+		l) #set label
+			LABEL=$OPTARG
 			;;
 
 		p) #set port
@@ -98,6 +103,13 @@ if [[ -z "${IP}" ]]; then
   IP=${HOST}
 fi
 
+if [[ -z "${LABEL}" && -f /etc/services ]]; then
+	LABEL=$(grep "${PORT}/tcp" /etc/services |cut -f1)
+fi
+if [[ -n "${LABEL}" ]]; then
+	LABEL=" (${LABEL})"
+fi
+
 #-----------
 # GET DATE |
 #-----------
@@ -134,17 +146,17 @@ DATE_DIFFERENCE_DAYS=$((DATE_DIFFERENCE_SECONDS/60/60/24))
 # OUTPUT |
 #---------
 if [[ "${DATE_DIFFERENCE_DAYS}" -le "${CRITICAL_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "CRITICAL: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
+	echo -e "CRITICAL: Cert $COMMON_NAME$LABEL will expire on: ${DATE_EXPIRE_FORMAT}"
 	exit 2
 elif [[ "${DATE_DIFFERENCE_DAYS}" -le "${WARNING_DAYS}" && "${DATE_DIFFERENCE_DAYS}" -ge "0" ]]; then
-	echo -e "WARNING: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
+	echo -e "WARNING: Cert $COMMON_NAME$LABEL will expire on: ${DATE_EXPIRE_FORMAT}"
 	exit 1
 elif [[ "${DATE_DIFFERENCE_DAYS}" -lt "0" ]]; then
-	echo -e "CRITICAL: Cert $COMMON_NAME expired on: ${DATE_EXPIRE_FORMAT}"
+	echo -e "CRITICAL: Cert $COMMON_NAME$LABEL expired on: ${DATE_EXPIRE_FORMAT}"
 	exit 2
 else
 	if [[ "${QUIET}" -lt 1 ]]; then
-		echo -e "OK: Cert $COMMON_NAME will expire on: ${DATE_EXPIRE_FORMAT}"
+		echo -e "OK: Cert $COMMON_NAME$LABEL will expire on: ${DATE_EXPIRE_FORMAT}"
 	fi
 	exit 0
 fi
