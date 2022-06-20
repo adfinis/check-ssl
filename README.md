@@ -18,20 +18,22 @@
 * Easy integrateable for monitoring e.g a cron service or icinga
 
 ## The Script can deal with these options:
-* -H
+* `-H`
   * Sets the value for the hostname. e.g adfinis-sygroup.ch
-* -I
+* `-I`
   * Sets an optional value for an IP to connect. e.g 127.0.0.1
-* -p
+* `-p`
   * Sets the value for the port. e.g 443
-* -P
+* `-P`
   * Sets an optional value for an TLS protocol. e.g xmpp.
   * Automatically gets set for some known port numbers.
-* -w
+* `-w`
   * Sets the value for the days before warning. Default is 30
-* -c
+* `-c`
   * Sets the value for the days before critical. Default is 5
-* -h
+* `-l`
+  * Sets an optional label for the host in messages. Default uses /etc/services.
+* `-h`
 
 
 #### Example
