@@ -52,11 +52,7 @@ while getopts :H:I:l:p:P:w:c:qh FLAG; do
 			;;
 
 		P) #set tls intended protocol
-			if [ "${OPTARG}" == "no_tls" ] || [ -z "${OPTARG}" ]; then
-				PROTOCOL=""
-			else
-				PROTOCOL=$OPTARG
-			fi
+			PROTOCOL=$OPTARG
 			;;
 
 		w) #set day before warning
@@ -95,12 +91,24 @@ if [[ -z "${PORT}" ]]; then
 	PORT=443
 fi
 
+if [[ -z "${PROTOCOL}" ]]; then
+	case "$PORT" in
+		110) PROTOCOL=pop3;;
+		143) PROTOCOL=imap;;
+		5222) PROTOCOL=xmpp;;
+		5269) PROTOCOL=xmpps;;
+	esac
+fi
+if [[ "${PROTOCOL}" = "no_tls" ]]; then
+	PROTOCOL=""
+fi
+
 if [[ -z "${HOST}" ]]; then
 	HELP
 fi
 
 if [[ -z "${IP}" ]]; then
-  IP=${HOST}
+	IP=${HOST}
 fi
 
 if [[ -z "${LABEL}" && -f /etc/services ]]; then

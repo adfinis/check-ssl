@@ -25,7 +25,8 @@
 * -p
   * Sets the value for the port. e.g 443
 * -P
-  * Sets an optional value for an TLS protocol. e.g xmpp
+  * Sets an optional value for an TLS protocol. e.g xmpp.
+  * Automatically gets set for some known port numbers.
 * -w
   * Sets the value for the days before warning. Default is 30
 * -c
